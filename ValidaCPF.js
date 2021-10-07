@@ -1,56 +1,61 @@
-function ValidadorCPF(cpf) {
-    this.cpfOriginal = cpf;
+class ValidadorCPF {
+    constructor(cpf) {
+        this.cpfOriginal = cpf;
+    }
     
-    let cpfCalculadoTemp = Array.from(this.cpfOriginal.replace(/\D+/g, ''));
-    cpfCalculadoTemp.splice(9,2);
-    cpfCalculadoTemp = calculaPrimeiroDigito(cpfCalculadoTemp);
-    cpfCalculadoTemp = calculaSegundoDigito(cpfCalculadoTemp);
+    validaCPF() {
+        this.cpfCalculado = Array.from(this.cpfOriginal.replace(/\D+/g, ''));
+        this.cpfCalculado.splice(9,2);
+        this.calculaPrimeiroDigito();
+        this.calculaSegundoDigito();
+        this.formataArrayToString();
+    }
+
+    get cpfValido() {
+        if (this.cpfCalculado === undefined) {
+            this.validaCPF();
+        }
+        return this.cpfCalculado === this.cpfOriginal ? 'válido' : 'inválido';
+    }
+
+    report() {
+        if (this.cpfCalculado === undefined) {
+            this.validaCPF();
+        }
+        console.log(`Seu cpf ${this.cpfOriginal} é ${this.cpfValido}`);
+    }
     
-    this.cpfCalculado = formataArrayToString(cpfCalculadoTemp);
+    calculaPrimeiroDigito = () => {
+        let primeiroDigito = 11 - (this.cpfCalculado.reduce((ac, val, index) => ac + (Number(val) * Math.abs(index - 10)), 0) % 11);
+    
+        this.cpfCalculado.splice(9, 0, 
+            primeiroDigito >= 10 ? '0' : primeiroDigito.toString()
+        );
+    }
+    
+    calculaSegundoDigito = () => {
+        let segundoDigito = 11 - (this.cpfCalculado.reduce((ac, val, index) => ac + (Number(val) * Math.abs(index - 11)), 0) % 11);
+    
+        this.cpfCalculado.splice(10, 0, 
+            segundoDigito >= 10 ? '0' : segundoDigito.toString()
+        );
+    }
+    
+    formataArrayToString() {
+    
+        this.cpfCalculado.splice(3, 0, '.');
+        this.cpfCalculado.splice(7, 0, '.');
+        this.cpfCalculado.splice(11, 0, '/');
+    
+        this.cpfCalculado = this.cpfCalculado.toString().replaceAll(',', '');
+    };
 };
-
-Object.defineProperty(ValidadorCPF.prototype, 'cpfValido',
-{
-    get() {
-        return (this.cpfCalculado === undefined || this.cpfOriginal === undefined) ? 'Erro, campos indefinidos.' 
-            : this.cpfCalculado === this.cpfOriginal ? 'válido' : 'inválido';
-    },
-});
-
-ValidadorCPF.prototype.report = function() { console.log(`Seu cpf ${this.cpfOriginal} é ${this.cpfValido}`); };
-
-const calculaPrimeiroDigito = (cpf) => {
-    let primeiroDigito = 11 - (cpf.reduce((ac, val, index) => ac + (Number(val) * Math.abs(index - 10)), 0) % 11);
-
-    cpf.splice(9, 0, 
-        primeiroDigito >= 10 ? '0' : primeiroDigito.toString()
-    );
-
-    return cpf;
-}
-
-const calculaSegundoDigito = (cpf) => {
-    let segundoDigito = 11 - (cpf.reduce((ac, val, index) => ac + (Number(val) * Math.abs(index - 11)), 0) % 11);
-
-    cpf.splice(10, 0, 
-        segundoDigito >= 10 ? '0' : segundoDigito.toString()
-    );
-
-    return cpf;
-}
-
-const formataArrayToString = (cpf) => {
-
-    cpf.splice(3, 0, '.');
-    cpf.splice(7, 0, '.');
-    cpf.splice(11, 0, '/');
-
-    return cpf.toString().replaceAll(',', '');
-};
-
 
 // TESTES
-let validaCPF = new ValidadorCPF('330.803.178/73');
+let validaCPF = new ValidadorCPF('330.803.178/74');
+
+// validaCPF.validaCPF();
+// console.log(validaCPF);
 
 console.log(validaCPF.cpfValido);
 
