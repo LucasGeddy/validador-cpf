@@ -3,7 +3,7 @@ class ValidadorCPF {
         this.cpfOriginal = cpf;
     }
     
-    validaCPF() {
+    validar() {
         this.cpfCalculado = Array.from(this.cpfOriginal.replace(/\D+/g, ''));
         this.cpfCalculado.splice(9,2);
         this.calculaPrimeiroDigito();
@@ -13,14 +13,14 @@ class ValidadorCPF {
 
     get cpfValido() {
         if (this.cpfCalculado === undefined) {
-            this.validaCPF();
+            this.validar();
         }
         return this.cpfCalculado === this.cpfOriginal ? 'válido' : 'inválido';
     }
 
     report() {
         if (this.cpfCalculado === undefined) {
-            this.validaCPF();
+            this.validar();
         }
         console.log(`Seu cpf ${this.cpfOriginal} é ${this.cpfValido}`);
     }
